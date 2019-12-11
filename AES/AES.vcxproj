@@ -11,7 +11,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <MASM Include="addRoundKey.asm" />
+    <MASM Include="generateKey.asm" />
     <MASM Include="main.asm" />
+    <MASM Include="mixCols.asm" />
+    <MASM Include="shiftRows.asm" />
+    <MASM Include="subBytes.asm" />
+    <MASM Include="varsInit.asm" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="procs.inc" />
+    <None Include="vars.inc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4164AA65-1EF9-4E69-899B-D1BED776070B}</ProjectGuid>
