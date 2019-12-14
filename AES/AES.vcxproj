@@ -11,17 +11,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="addRoundKey.asm" />
-    <MASM Include="generateKey.asm" />
+    <MASM Include="AddRoundKey.asm" />
+    <MASM Include="GenerateKey.asm" />
     <MASM Include="main.asm" />
-    <MASM Include="mixCols.asm" />
-    <MASM Include="shiftRows.asm" />
-    <MASM Include="subBytes.asm" />
-    <MASM Include="varsInit.asm" />
+    <MASM Include="Constants.asm" />
+    <MASM Include="MixCols.asm" />
+    <MASM Include="ShiftRows.asm" />
+    <MASM Include="SubBytes.asm" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="procs.inc" />
-    <None Include="vars.inc" />
+    <None Include="AES.inc">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4164AA65-1EF9-4E69-899B-D1BED776070B}</ProjectGuid>
