@@ -37,23 +37,13 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\_CONFIG\_CONFIG.csproj">
-      <Project>{48efe60b-2d22-43f3-9823-aa6a978f267e}</Project>
+      <Project>{800ba467-9154-4abe-9327-94363b82772c}</Project>
       <Name>_CONFIG</Name>
     </ProjectReference>
   </ItemGroup>
