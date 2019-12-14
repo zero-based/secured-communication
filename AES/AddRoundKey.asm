@@ -1,8 +1,4 @@
-INCLUDE procs.inc			; get procedure prototypes
-INCLUDE vars.inc			; get variables
-
-.data
-arraySize DWORD 16
+INCLUDE AES.inc
 
 .code
 
@@ -17,7 +13,7 @@ AddRndKey	PROC,
 ; ----------------------------------------------------------
 			pushad						; save all registers
 
-			mov		ecx, arraySize		; loop counter 
+			mov		ecx, MSG_BYTES		; loop counter 
 			mov		edi, msg
 			mov		esi, key
 XorLoop:	mov		al, BYTE PTR [edi]

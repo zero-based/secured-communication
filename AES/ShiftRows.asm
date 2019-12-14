@@ -1,9 +1,7 @@
-INCLUDE procs.inc							; get procedure prototypes
-INCLUDE vars.inc							; get variables
+INCLUDE AES.inc
 
 .data
 rowIndex BYTE ?
-arraySize DWORD 16 
 
 .code
 
@@ -20,7 +18,7 @@ ShiftRows	PROC,
 			pushad							; save all registers
 
 			mov		rowIndex, 0
-			mov		ecx, 4 
+			mov		ecx, MSG_ROWS 
 			mov		esi, msg
 
 Shift:		mov		eax, [esi]
@@ -31,9 +29,9 @@ Shift:		mov		eax, [esi]
 			ror		eax, cl					; encrypt
 			jmp		Next
 Decrypt:	rol		eax, cl					; decrypt
-Next:		add		rowIndex, 8
+Next:		add		rowIndex, BITS_PER_BYTE
 			mov		[esi], eax
-			add		esi, TYPE arraySize
+			add		esi, MSG_ROWS
 			pop		ecx
 			loop	Shift
 

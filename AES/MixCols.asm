@@ -1,5 +1,4 @@
-INCLUDE procs.inc			; get procedure prototypes
-INCLUDE vars.inc			; get variables
+INCLUDE AES.inc
 
 .code
 

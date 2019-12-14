@@ -1,24 +1,20 @@
-INCLUDE procs.inc									; get procedure prototypes
-INCLUDE vars.inc									; get variables
-
-.data
-arraySize DWORD 16 
+INCLUDE AES.inc
 
 .code
 	
 ;-----------------------------------------------------
 SubBytes	PROC,
 			msg		:PTR BYTE,						; Offset of message
-			_Sbox	:PTR BYTE						; Offset of SBox matrix
+			_Sbox	:PTR BYTE						; Offset of S_BOX matrix
 ;
 ; Each byte in message matrix is replaced with another
-; according to [SBox] lookup table.
+; according to [S_BOX] lookup table.
 ; Returns: nothing
 ;-----------------------------------------------------
 			pushad									; save all registers
 
 			mov		ebx, 0							; indexing message matrix
-			mov		ecx, arraySize					; loop counter
+			mov		ecx, MSG_BYTES					; loop counter
 			mov		edx, msg
 Subst:		mov		esi, _Sbox
 			movzx	eax, BYTE PTR [edx]				; access message matrix

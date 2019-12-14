@@ -1,8 +1,7 @@
-.model flat,STDCALL
-INCLUDE vars.inc			
+INCLUDE AES.inc			
 
 .data
-SBox		BYTE 063h, 07ch, 077h, 07bh, 0f2h, 06bh, 06fh, 0c5h, 030h, 001h, 067h, 02bh, 0feh, 0d7h, 0abh, 076h
+S_BOX		BYTE 063h, 07ch, 077h, 07bh, 0f2h, 06bh, 06fh, 0c5h, 030h, 001h, 067h, 02bh, 0feh, 0d7h, 0abh, 076h
 			BYTE 0cah, 082h, 0c9h, 07dh, 0fah, 059h, 047h, 0f0h, 0adh, 0d4h, 0a2h, 0afh, 09ch, 0a4h, 072h, 0c0h
 			BYTE 0b7h, 0fdh, 093h, 026h, 036h, 03fh, 0f7h, 0cch, 034h, 0a5h, 0e5h, 0f1h, 071h, 0d8h, 031h, 015h
 			BYTE 004h, 0c7h, 023h, 0c3h, 018h, 096h, 005h, 09ah, 007h, 012h, 080h, 0e2h, 0ebh, 027h, 0b2h, 075h
@@ -20,7 +19,7 @@ SBox		BYTE 063h, 07ch, 077h, 07bh, 0f2h, 06bh, 06fh, 0c5h, 030h, 001h, 067h, 02b
 			BYTE 08ch, 0a1h, 089h, 00dh, 0bfh, 0e6h, 042h, 068h, 041h, 099h, 02dh, 00fh, 0b0h, 054h, 0bbh, 016h
 
 
-InvSBox     BYTE 052h, 009h, 06ah, 0d5h, 030h, 036h, 0a5h, 038h, 0bfh, 040h, 0a3h, 09eh, 081h, 0f3h, 0d7h, 0fbh
+INV_S_BOX	BYTE 052h, 009h, 06ah, 0d5h, 030h, 036h, 0a5h, 038h, 0bfh, 040h, 0a3h, 09eh, 081h, 0f3h, 0d7h, 0fbh
 			BYTE 07ch, 0e3h, 039h, 082h, 09bh, 02fh, 0ffh, 087h, 034h, 08eh, 043h, 044h, 0c4h, 0deh, 0e9h, 0cbh
 			BYTE 054h, 07bh, 094h, 032h, 0a6h, 0c2h, 023h, 03dh, 0eeh, 04ch, 095h, 00bh, 042h, 0fah, 0c3h, 04eh
 			BYTE 008h, 02eh, 0a1h, 066h, 028h, 0d9h, 024h, 0b2h, 076h, 05bh, 0a2h, 049h, 06dh, 08bh, 0d1h, 025h
@@ -38,19 +37,19 @@ InvSBox     BYTE 052h, 009h, 06ah, 0d5h, 030h, 036h, 0a5h, 038h, 0bfh, 040h, 0a3
 			BYTE 017h, 02bh, 004h, 07eh, 0bah, 077h, 0d6h, 026h, 0e1h, 069h, 014h, 063h, 055h, 021h, 00ch, 07dh
 
 
-EMulMatrix	BYTE 002, 003, 001, 001
+ENC_MATRIX	BYTE 002, 003, 001, 001
 			BYTE 001, 002, 003, 001
 			BYTE 001, 001, 002, 003
 			BYTE 003, 001, 001, 002
 
 
-DMulMatrix	BYTE 0eh, 0bh, 0dh, 09h
+DEC_MATRIX	BYTE 0eh, 0bh, 0dh, 09h
 			BYTE 09h, 0eh, 0bh, 0dh
 			BYTE 0dh, 09h, 0eh, 0bh
 			BYTE 0bh, 0dh, 09h, 0eh
 
 
-RoundTable	BYTE 01h, 02h, 04h, 08h, 10h, 20h, 40h, 80h, 1bh, 36h
+ROUND_TABLE	BYTE 01h, 02h, 04h, 08h, 10h, 20h, 40h, 80h, 1bh, 36h
 			BYTE 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h
 			BYTE 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h
 			BYTE 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h
