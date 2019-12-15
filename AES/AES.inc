@@ -55,6 +55,7 @@ ShiftRows	PROTO,
 			encrypt	:BYTE				; Encrypt/Decrypt Flag
 
 MixCols		PROTO,
-			msg		:PTR BYTE			; Offset of message matrix
+			msg		:PTR BYTE,			; Offset of message matrix
+			mode	:BYTE				; Encryptipn/decryption Flag
 
 
