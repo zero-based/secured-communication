@@ -24,7 +24,7 @@ EXTERNDEF	INV_S_BOX	:BYTE
 EXTERNDEF	ENC_MATRIX	:BYTE 
 EXTERNDEF	DEC_MATRIX	:BYTE
 EXTERNDEF	ROUND_TABLE	:BYTE
-
+EXTERNDEF	KEY_EXPAN	:BYTE
 
 
 ; Procedures Prototypes
@@ -32,18 +32,9 @@ EXTERNDEF	ROUND_TABLE	:BYTE
 ColMajor	PROTO,
 			mtrx	:PTR BYTE			; Offset of row-major ordered array
 
-GenerateKey	PROTO,
-			key1	:PTR BYTE,			; Offset of Previous key matrix
-			key2	:PTR BYTE			; Offset New key matrix
+ExpandKey	PROTO,
+			key		:PTR BYTE			; Offset of input key matrix
 
-Col1		PROTO, 
-			key1	:PTR BYTE,			; Previous Round's Key Offset
-			key2	:PTR BYTE,			; New Key Offset in keys array
-			_Rcon	:BYTE				; Rounding Constant according to round number
-
-XORCols		PROTO,
-			key1	:PTR BYTE,			; Offset of message matrix
-			key2	:PTR BYTE			; Offset of output Column
 
 AddRndKey	PROTO,
 			msg		:PTR BYTE,			; Offset of message matrix

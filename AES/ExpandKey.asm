@@ -2,38 +2,15 @@ INCLUDE AES.inc
 
 .data
 
-coli DWORD  0											; temp Loop Counter
-rowi DWORD  0											; temp Loop Counter
+coli	DWORD	0												; temp Loop Counter
+rowi	DWORD	0												; temp Loop Counter
 
 .code
 
-;-----------------------------------------------------
-GenerateKey	PROC,
-			key1	:PTR BYTE,			; Offset of Previous key matrix
-			key2	:PTR BYTE			; Offset New key matrix
-;
-; Given matrix of the previous key, it’ll generate the next key matrix,
-; where each Round key depends the previous round key.
-; Returns: nothing
-;-----------------------------------------------------
-			pushad												; save all registers
-
-			mov		esi, key1
-			mov		edi, key2
-			mov		ebx, offset ROUND_TABLE
-			INVOKE	Col1, esi, edi, [ebx]
-			INVOKE	XORCols, esi, edi
-
-			popad												; restore all registers
-			ret
-GenerateKey ENDP
-
-
-
-Col1 PROC, 
-			key1	:PTR BYTE,			; Offset of Previous key matrix
-			key2	:PTR BYTE,			; Offset New key matrix
-			_RCON	:BYTE				; Rounding Constant according to round number
+Col1		PROC, 
+			key1	:PTR BYTE,									; Offset of Previous key matrix
+			key2	:PTR BYTE,									; Offset New key matrix
+			_RCON	:BYTE										; Rounding Constant according to round number
 ;
 ; Generates the first Column in a new key matrix as follows:
 ;	 1) Rotate the column one byte upwards.
@@ -88,10 +65,9 @@ L2:			push	ecx
 Col1		ENDP
 
 
-
-XORCols PROC,
-			key1	:PTR BYTE,			; Offset of Previous key matrix
-			key2	:PTR BYTE			; Offset New key matrix
+XORCols		PROC,
+			key1	:PTR BYTE,									; Offset of Previous key matrix
+			key2	:PTR BYTE									; Offset New key matrix
 ;
 ; XORs W[i-1] and W[i-4] where W[i-1] is the previous column in same key matrix,
 ; and W[i-4] is the same column in previous key matrix.
@@ -128,4 +104,36 @@ Inner:		mov		ebx, coli
 			ret
 XORCols		ENDP
 
+;-----------------------------------------------------
+ExpandKey	PROC,
+			key		:PTR BYTE									; Offset of input key matrix
+;
+; Given matrix of the input key, it’ll generate the expansion key matrix,
+; where each Round key depends the previous round key.
+; Returns: nothing
+;-----------------------------------------------------
+			pushad												; save all registers
+
+			mov		esi, key
+			mov		edi, OFFSET KEY_EXPAN
+			mov		ecx, KEY_BYTES	
+			cld
+			rep		movsb										; Copy input key matrix to key expansion matrix
+			
+			mov		esi, OFFSET KEY_EXPAN						; Initialize esi with first key
+			mov		edi, OFFSET KEY_EXPAN + KEY_BYTES			; Initialize esi with next key (redundant)
+
+			mov		ecx, 0
+
+Expansion:	INVOKE	Col1, esi, edi, ROUND_TABLE[ecx]			; Calculate `g` operation to get first column in the new key
+			INVOKE	XORCols, esi, edi							; Claculate Columns XORing to get the rest of the new key
+			add		esi, KEY_BYTES
+			add		edi, KEY_BYTES
+			inc		ecx
+			cmp		ecx, 10										; 10 Rounds of expansion
+			jne		Expansion
+
+			popad												; restore all registers
+			ret
+ExpandKey ENDP
 END
