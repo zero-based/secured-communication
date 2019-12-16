@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <MASM Include="AddRoundKey.asm" />
+    <MASM Include="ColMajor.asm" />
     <MASM Include="GenerateKey.asm" />
     <MASM Include="main.asm" />
     <MASM Include="Constants.asm" />

@@ -29,7 +29,10 @@ EXTERNDEF	ROUND_TABLE	:BYTE
 
 ; Procedures Prototypes
 
-GenerateKey	 PROTO,
+ColMajor	PROTO,
+			mtrx	:PTR BYTE			; Offset of row-major ordered array
+
+GenerateKey	PROTO,
 			key1	:PTR BYTE,			; Offset of Previous key matrix
 			key2	:PTR BYTE			; Offset New key matrix
 
