@@ -54,4 +54,6 @@ ROUND_TABLE	BYTE 01h, 02h, 04h, 08h, 10h, 20h, 40h, 80h, 1bh, 36h
 			BYTE 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h
 			BYTE 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h, 00h
 
+KEY_EXPAN	BYTE 176 Dup (?)
+
 END
