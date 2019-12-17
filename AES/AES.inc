@@ -4,6 +4,8 @@
 
 BITS_PER_BYTE = 8
 
+ADV_MUL_CONST = 1bh
+
 MSG_ROWS      = 4
 MSG_COLS      = 4
 MSG_BYTES     = MSG_ROWS * MSG_COLS
