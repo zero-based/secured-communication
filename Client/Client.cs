@@ -35,7 +35,7 @@ namespace ClientNS
             // Send Encrypted Message's Bytes
             var encryptedBytes = msgBytes;
             sender.Send(encryptedBytes);
-            var encryptedMsg = Encoding.ASCII.GetString(encryptedBytes);
+            var encryptedMsg = BitConverter.ToString(encryptedBytes);
             Logger.Log("Sent", encryptedMsg);
 
             Logger.Separator();

@@ -31,7 +31,7 @@ namespace ServerNS
             // Receive Encrypted Message
             var encryptedBytes = new byte[Config.BytesCount];
             clientSocket.Receive(encryptedBytes);
-            var encryptedMsg = Encoding.ASCII.GetString(encryptedBytes);
+            var encryptedMsg = BitConverter.ToString(encryptedBytes);
             Logger.Log("Received", encryptedMsg);
 
             // Decrypt Message

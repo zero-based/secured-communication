@@ -14,7 +14,7 @@ KEY_COLS      = 4
 KEY_BYTES     = KEY_ROWS * KEY_COLS
 KEY_BITS      = BITS_PER_BYTE * KEY_BYTES
 
-
+ROUNDS = 10
 
 
 ; Shared Memory Data
