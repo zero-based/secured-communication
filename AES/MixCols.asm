@@ -3,24 +3,149 @@ INCLUDE AES.inc
 
 .data
 
-outputArr		BYTE  MSG_BYTES dup (?)
-encryptVar		BYTE  ?
-arrVarCounter	BYTE  ?
-mulCase3		BYTE  ?
-secondMulCase3	BYTE  ?
-mulCase2		BYTE  ?
-index			DWORD ?
-columnIndex		BYTE  ?
-rowIndex		DWORD ?
-counter			BYTE  ?
-rowCounter		BYTE  ?
-temp			DWORD ?
-mul0			BYTE  ?
-mul1			BYTE  ?
-mul2			BYTE  ?
-mul3			BYTE  ?
+res				BYTE	?
+x00				BYTE	?
+x01				BYTE	?
+x02				BYTE	?
+x03				BYTE	?
+
+outputArr		BYTE	MSG_BYTES dup (?)
+encryptVar		BYTE	?
+arrVarCounter	BYTE	?
+index			DWORD	?
+columnIndex		BYTE	?
+rowIndex		DWORD	?
+counter			BYTE	?
+rowCounter		BYTE	?
+temp			DWORD	?
 
 .code
+
+;-----------------------------------------------------
+MulShift	PROC,
+			x	:BYTE
+;
+; Shifts the byte to left by one, check the output bit if it’s one
+; then XOR with `ADV_MUL_CONST` then use this value as the output of multiplication.
+; If it’s zero then use this shifted value asthe output of multiplication.
+; Returns: Result in EAX
+;-----------------------------------------------------
+
+			pushad
+
+			mov		al, x
+			shl		al, 1
+			jc		carry
+			jmp		return
+carry:		xor		al, ADV_MUL_CONST
+
+return:		mov		res, al
+			popad
+			mov		al, res
+			ret
+
+MulShift	ENDP
+
+;-----------------------------------------------------
+AdvMulEnc	PROC,
+			x	:BYTE,					; Value of required byte from msg matrix
+			y	:BYTE					; Value of required byte from (ENC/DEC)_MATRIX
+;
+; Multiplys x times y using advanced multiplication
+; Returns: Result in EAX
+;-----------------------------------------------------
+
+			pushad
+
+			mov		al, x
+			mov		bl, y
+			mov		x00, al
+			INVOKE	MulShift, x00
+			mov		x01, al
+
+
+			cmp		bl, 1
+			je		case1
+			cmp		bl, 2
+			je		case2
+			cmp		bl, 3
+			je		case3
+
+case1:		mov		al, x00
+			mov		res, al
+			jmp		return
+
+case2:		mov		al, x01
+			mov		res, al
+			jmp		return
+
+case3:		mov		al, x00
+			xor		al, x01
+			mov		res, al
+
+return:		popad
+			mov		al, res
+			ret
+
+AdvMulEnc	ENDP
+
+
+;-----------------------------------------------------
+AdvMulDec	PROC,
+			x	:BYTE,					; Value of required byte from msg matrix
+			y	:BYTE					; Value of required byte from (ENC/DEC)_MATRIX
+;
+; Multiplys x times y using advanced multiplication
+; Returns: Result in EAX
+;-----------------------------------------------------
+
+			pushad
+
+			mov		al, x
+			mov		bl, y
+
+			mov		x00, al
+			INVOKE	MulShift, x00
+			mov		x01, al
+			INVOKE	MulShift, x01
+			mov		x02, al
+			INVOKE	MulShift, x02
+			mov		x03, al
+
+			cmp		bl, 09h
+			je		case09
+			cmp		bl, 0bh
+			je		case0b
+			cmp		bl, 0dh
+			je		case0d
+			cmp		bl, 0eh
+			jmp		case0e
+
+case09:		mov		al, x00
+			xor		al, x03
+			jmp		return
+
+case0b:		mov		al, x03
+			xor		al, x01
+			xor		al, x00
+			jmp		return
+
+case0d:		mov		al, x03
+			xor		al, x02
+			xor		al, x00
+			jmp		return
+
+case0e:		mov		al, x03
+			xor		al, x02
+			xor		al, x01
+
+return:		mov		res, al
+
+			popad
+			mov		al, res
+			ret
+
+AdvMulDec	ENDP
 
 ;-----------------------------------------------------
 Encryption PROC,
@@ -38,10 +163,10 @@ Encryption PROC,
 			movzx	eax, BYTE PTR [esi]
 			movzx	ebx, BYTE PTR [edi]
 
-
 			mov		counter, 0
 			mov		index, 0
 			mov		rowIndex, 0
+			mov		rowCounter, 0
 			mov		columnIndex, 0
 			mov		arrVarCounter, MSG_BYTES
 
@@ -65,42 +190,7 @@ innerLoop:	mov		esi, msg
 			mov		edi, OFFSET ENC_MATRIX 
 			add		esi, index
 			add		edi, rowIndex
-			mov		al, [esi]
-			movzx	ebx, BYTE PTR [edi]
-			cmp		ebx, 1
-			je		case1
-			cmp		ebx, 2
-			je		case2
-			cmp		ebx, 3
-			je		case3
-
-case1:		mov		al, BYTE PTR [esi]
-			jmp		addNew
-
-case2:		shl		al, 1
-			cmp		BYTE PTR [esi], 1
-			mov		mulCase2, al
-			js		carryFlag
-			jmp		addNew
-
-carryFlag:	xor		mulCase2, 01bh
-			mov		al, mulCase2
-			jmp		addNew
-
-case3:		mov		mulCase3, al
-			shl		al, 1
-			cmp		BYTE PTR [esi], 1
-			js		isNegative
-			mov		secondMulCase3, al
-			mov		al, secondMulCase3
-			xor		al, mulCase3
-			jmp		addNew
-
-isNegative:	xor		eax, 01bh
-			mov		secondMulCase3, al 
-			mov		al, secondMulCase3
-			xor		al, mulCase3
-			jmp		addNew
+			INVOKE	AdvMulEnc, [esi], BYTE PTR [edi]
 
 addNew:		xor		encryptVar, al
 			mov		al, encryptVar
@@ -149,6 +239,7 @@ sameCloumn:	inc		rowIndex
 
 			popad
 			ret
+
 Encryption ENDP
 
 ;-----------------------------------------------------
@@ -169,6 +260,7 @@ Decryption PROC,
 			mov		counter, 0
 			mov		index, 0
 			mov		rowIndex, 0
+			mov		rowCounter, 0
 			mov		columnIndex, 0
 			mov		arrVarCounter, MSG_BYTES
 
@@ -181,8 +273,8 @@ nextRow:	inc		rowCounter
 			mov		index, 0
 			add		rowIndex, MSG_ROWS 
 			push    ebx
-			mov		ebx,rowIndex
-			mov     temp,ebx
+			mov		ebx, rowIndex
+			mov     temp, ebx
 			pop		ebx
 			mov		columnIndex, 0
 
@@ -192,64 +284,8 @@ innerLoop:	mov		esi, msg
 			mov		edi, OFFSET DEC_MATRIX 
 			add		esi, index
 			add		edi, rowIndex
-			mov		al, [esi]
-			movzx	ebx, BYTE PTR [edi]
+			INVOKE	AdvMulDec, [esi], BYTE PTR [edi]
 
-			mov		al, BYTE PTR [esi]
-			mov		mul0, al
-			shl		al, 1
-			cmp		mul0, 1
-			js		negative
-			mov		mul1, al
-			jmp		X1
-
-negative:	xor		al, 01Bh
-			mov		mul1, al
-
-X1:			shl		al, 1
-			cmp		mul1, 1
-			js		negative1
-			mov		mul2, al
-			jmp		X2
-
-negative1:	xor		al, 01Bh
-			mov		mul2, al
-
-X2:			shl		al, 1
-			cmp		mul2, 1
-			js		negative3
-			mov		mul3, al
-			jmp		mulIsOver
-
-negative3:	xor		al, 01Bh
-			mov		mul3, al
-
-mulIsOver:	cmp		ebx, 09h
-			je		case09
-			cmp		ebx, 0Bh
-			je		case0B
-			cmp		ebx, 0Dh
-			je		case0D
-			cmp		ebx, 0Eh
-			je		case0E
-
-case09:		movzx	eax, mul0
-			xor		al, mul3
-			jmp		addNew
-
-case0B:		movzx	eax, mul3
-			xor		al, mul1
-			xor		al, mul0
-			jmp		addNew
-
-case0D:		movzx	eax, mul3
-			xor		al, mul2
-			xor		al, mul0
-			jmp		 addNew
-case0E:		movzx	eax, mul3
-			xor		al, mul2
-			xor		al, mul1
-			jmp		addNew
 
 addNew:		xor		encryptVar, al
 			mov		al, encryptVar
