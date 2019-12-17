@@ -136,4 +136,29 @@ Expansion:	INVOKE	Col1, esi, edi, ROUND_TABLE[ecx]			; Calculate `g` operation t
 			popad												; restore all registers
 			ret
 ExpandKey ENDP
+
+;-----------------------------------------------------
+GetKey		PROC,
+			rnd		:DWORD,										; Round Number 0 - 10
+			key		:PTR BYTE									; Pointer to returned round Key [out]
+;
+; Given the number of round, it’ll fill the key matrix
+; with the current round key.
+; Returns: nothing
+;-----------------------------------------------------
+			pushad												; save all registers
+
+			mov		esi, OFFSET KEY_EXPAN
+			mov		cl, KEY_COLS
+			shl		rnd, cl
+			add		esi, rnd
+			mov		edi, key
+			cld
+			mov		ecx, KEY_BYTES
+			rep		movsb
+
+			popad												; restore all registers
+			ret
+GetKey ENDP
+
 END

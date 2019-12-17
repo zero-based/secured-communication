@@ -38,7 +38,7 @@ ExpandKey	PROTO,
 
 AddRndKey	PROTO,
 			msg		:PTR BYTE,			; Offset of message matrix
-			key		:PTR BYTE			; Offset of key matrix
+			rnd		:DWORD				; Round Number
 
 SubBytes	PROTO,
 			msg		:PTR BYTE,			; Offset of message matrix
@@ -52,4 +52,6 @@ MixCols		PROTO,
 			msg		:PTR BYTE,			; Offset of message matrix
 			mode	:BYTE				; Encryptipn/decryption Flag
 
-
+GetKey		PROTO,
+			rnd		:DWORD,				; Round Number 0 - 10
+			key		:PTR BYTE			; Pointer to returned round Key [out]
