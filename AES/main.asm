@@ -3,8 +3,6 @@ INCLUDE AES.inc
 .386
 .stack 4096
 
-.data
-
 .code
 
 ;-----------------------------------------------------
@@ -23,15 +21,17 @@ DllMain PROC,
 DllMain ENDP
 
 
+
 ;-----------------------------------------------------
-Encrypt PROC EXPORT,
-	msg		:PTR BYTE,
-	key		:PTR BYTE
+Encrypt		PROC EXPORT,
+			msg		:PTR BYTE,
+			key		:PTR BYTE
 ;
 ; Encrypts a 128-bit messaage using the
 ; specified key and AES algorithm.
 ; Returns: Encrypted message 
 ;-----------------------------------------------------
+
 			pushad
 
 			INVOKE	ColMajor, msg
@@ -42,34 +42,36 @@ Encrypt PROC EXPORT,
 
 			mov		ecx, 1
 Round:		INVOKE	SubBytes, msg, OFFSET S_BOX
-			INVOKE	ShiftRows, msg, 1
-			INVOKE	MixCols, msg, 1
-			INVOKE	AddRndKey, msg, ecx
+			INVOKE	ShiftRows, msg, ENC_MODE
+			INVOKE	MixCols, msg, OFFSET ENC_MATRIX
+			INVOKE	AddRndKey, msg, cl
 			inc		ecx
 			cmp		ecx, ROUNDS
 			jb		Round
 
 			INVOKE	SubBytes, msg, OFFSET S_BOX
-			INVOKE	ShiftRows, msg, 1
-			INVOKE	AddRndKey, msg, ROUNDS
+			INVOKE	ShiftRows, msg, ENC_MODE
+			INVOKE	AddRndKey, msg, cl
 
 			INVOKE	ColMajor, msg
 
 			popad
             ret
 
-Encrypt ENDP
+Encrypt		ENDP
+
 
 
 ;-----------------------------------------------------
-Decrypt PROC EXPORT,
-	msg		:PTR BYTE,
-	key		:PTR BYTE
+Decrypt		PROC EXPORT,
+			msg		:PTR BYTE,
+			key		:PTR BYTE
 ;
 ; Decrypts a 128-bit encrypted messaage using the
 ; specified key and AES algorithm.
 ; Returns: Decrypted message 
 ;-----------------------------------------------------
+
 			pushad
 
 			INVOKE	ColMajor, msg
@@ -79,22 +81,23 @@ Decrypt PROC EXPORT,
             INVOKE	AddRndKey, msg, ROUNDS
 
 			mov		ecx, ROUNDS - 1
-Round:		INVOKE	ShiftRows, msg, 0
+Round:		INVOKE	ShiftRows, msg, DEC_MODE
 			INVOKE	SubBytes, msg, OFFSET INV_S_BOX
-			INVOKE	AddRndKey, msg, ecx
-			INVOKE	MixCols, msg, 0
+			INVOKE	AddRndKey, msg, cl
+			INVOKE	MixCols, msg, OFFSET DEC_MATRIX
 			dec		ecx
 			cmp		ecx, 0
 			ja		Round
 
-			INVOKE	ShiftRows, msg, 0
+			INVOKE	ShiftRows, msg, DEC_MODE
 			INVOKE	SubBytes, msg, OFFSET INV_S_BOX
-			INVOKE	AddRndKey, msg, 0
+			INVOKE	AddRndKey, msg, cl
+
 			INVOKE	ColMajor, msg
 
 			popad
             ret
 
-Decrypt ENDP
+Decrypt		ENDP
 
 END DllMain

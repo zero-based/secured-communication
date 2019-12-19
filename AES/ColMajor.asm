@@ -15,12 +15,14 @@ ColMajor	PROC,
 ; Returns: nothing
 ; ----------------------------------------------------------
 
+			pushad
+
 			; Move input bytes into src bytes
 
 			cld
-			mov		ecx, MSG_BYTES
 			mov		esi, mtrx
 			mov		edi, OFFSET src
+			mov		ecx, MSG_BYTES
 			rep		movsb
 
 
@@ -29,26 +31,27 @@ ColMajor	PROC,
 			mov		ebx, 0							; [i] : (base for src, index for dst)
 rows:		mov		esi, 0							; [j] : (base for dst, index for src)
 
-cols:		mov		al, src[ebx * MSG_COLS + esi]	; store src[i, j]
-			mov		dst[esi * MSG_COLS + ebx], al	; dst[j, i] = src[i, j]
+cols:		mov		al, src[ebx * MSG_SIZE + esi]	; store src[i, j]
+			mov		dst[esi * MSG_SIZE + ebx], al	; dst[j, i] = src[i, j]
 
 			inc		esi
-			cmp		esi, MSG_COLS
+			cmp		esi, MSG_SIZE
 			jb		cols
 		
 			inc		ebx
-			cmp		ebx, MSG_ROWS
+			cmp		ebx, MSG_SIZE
 			jb		rows
 
 
 			; Move dst bytes into the input bytes
 
 			cld
-			mov		ecx, MSG_BYTES
 			mov		esi, OFFSET dst
 			mov		edi, mtrx
+			mov		ecx, MSG_BYTES
 			rep		movsb
 
+			popad
 			ret
 
 ColMajor	ENDP

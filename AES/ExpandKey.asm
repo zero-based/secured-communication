@@ -1,16 +1,11 @@
 INCLUDE AES.inc
 
-.data
-
-coli	DWORD	0												; temp Loop Counter
-rowi	DWORD	0												; temp Loop Counter
-
 .code
 
 Col1		PROC, 
 			key1	:PTR BYTE,									; Offset of Previous key matrix
 			key2	:PTR BYTE,									; Offset New key matrix
-			_RCON	:BYTE										; Rounding Constant according to round number
+			rndCon	:BYTE										; Rounding Constant according to round number
 ;
 ; Generates the first Column in a new key matrix as follows:
 ;	 1) Rotate the column one byte upwards.
@@ -19,50 +14,42 @@ Col1		PROC,
 ;	 4) XOR with round constant column[RoundTable] (Choose column based on round number).
 ; Returns: nothing
 ;-----------------------------------------------------
-			pushad												; save all registers
+
+			pushad
 
 			mov		esi, key1
-			mov		ebx, key2
-			mov		ecx, 3
-
-L1:			mov		edx, 5										; Rotate the column one byte upwards
-			sub		edx, ecx
-			dec		edx
-			mov		al, [esi + KEY_ROWS * edx + KEY_COLS - 1]
-			dec		edx
-			mov		[ebx + KEY_ROWS * edx], al 
-	
-			Loop	L1
-	
-			mov		al, [esi + 3]
-			mov		[ebx + 12], al  
-	
-			mov		ecx, 4
-
 			mov		edi, key2
-			mov		ebx, 0
-			mov		esi, offset S_BOX
-L2:			push	ecx
-			push	esi
-			movzx	edx, BYTE PTR [edi + KEY_ROWS * ebx]		; Substitute column's bytes from S-box
-			mov		al,  BYTE PTR [esi + edx]
-			mov		esi, key1									; XOR with the same column in the previous key
-			mov		cl, BYTE PTR [esi + (4*(ebx))]
-			xor		al, cl
-			mov		[edi + (4*(ebx))], al
-			inc		ebx
-			pop		esi
-			pop		ecx
-			loop	L2
+
+			; Rotate the column one byte upwards
+				
+			mov		al, [esi + KEY_SIZE - 1]
+			mov		[edi + (KEY_SIZE - 1) * KEY_SIZE], al		; key2[3][0] = key1[0][3]
+
+			mov		ecx, KEY_SIZE - 1
+rotate:		mov		ebx, ecx
+			mov		al, [esi + ebx * KEY_SIZE + KEY_SIZE - 1]	
+			dec		ebx
+			mov		[edi + ebx * KEY_SIZE], al					; key2[i - 1][0] = key1[i][3]
+			loop	rotate
+	
+			mov		ecx, 0
+subXor:		mov		al, [esi + ecx * KEY_SIZE]	
+			movzx	edx, BYTE PTR [edi + ecx * KEY_SIZE]		; Substitute column's bytes from S-box
+			xor		al, S_BOX[edx]								; XOR with the same column in the previous key
+			mov		[edi + ecx * KEY_SIZE], al
+			inc		ecx
+			cmp		ecx, KEY_SIZE
+			jb		subXor
 			
-			mov		edi, key2									; XOR with round constant column[RCON]
 			mov		al, [edi]
-			xor		al, _RCON
+			xor		al, rndCon									; XOR with round constant column[RCON]
 			mov		[edi], al
 
-			popad												; restore all registers
+			popad
 			ret
+
 Col1		ENDP
+
 
 
 XORCols		PROC,
@@ -73,36 +60,36 @@ XORCols		PROC,
 ; and W[i-4] is the same column in previous key matrix.
 ; Returns: nothing
 ;-----------------------------------------------------
-			pushad												; save all registers
+
+			pushad
 
 			mov		esi, key1
 			mov		edi, key2
-			mov		rowi, 0										; Rows Counter
-			mov		coli, 1										; Columns Counter
-			mov		ecx, 3
-Outer:
-			push	ecx
-			mov		ecx, 4										; inner Loop Counter
-			mov		rowi, 0										; Reset Rows Counter
-Inner:		mov		ebx, coli
-			mov		eax, 4
-			mul		rowi
-			add		ebx, eax
-			mov		dl, BYTE PTR [esi + ebx]
-			dec		ebx
-			xor		dl, BYTE PTR [edi + ebx]
+
+			mov		ecx, 1										; Columns Counter (j), skip first column
+cols:		mov		ebx, 0										; Reset Rows Counter (i)
+
+rows:		mov		eax, KEY_SIZE
+			mul		ebx
+			add		eax, ecx
+			mov		dl, [esi + eax]
+			xor		dl, [edi + eax - 1]
+			mov		[edi + eax], dl								; key2[i][j] = key1[i][j] xor key2[i][j - 1]
+
 			inc		ebx
-			mov		[edi + ebx], dl
-			inc		rowi
-			loop	Inner
+			cmp		ebx, KEY_SIZE
+			jb		rows
 
-			inc		coli
-			pop		ecx
-			loop	Outer
+			inc		ecx
+			cmp		ecx, KEY_SIZE
+			jb		cols
 
-			popad												; restore all registers
+			popad
 			ret
+
 XORCols		ENDP
+
+
 
 ;-----------------------------------------------------
 ExpandKey	PROC,
@@ -112,53 +99,30 @@ ExpandKey	PROC,
 ; where each Round key depends the previous round key.
 ; Returns: nothing
 ;-----------------------------------------------------
-			pushad												; save all registers
 
-			mov		esi, key
-			mov		edi, OFFSET KEY_EXPAN
-			mov		ecx, KEY_BYTES	
+			pushad
+
 			cld
+			mov		esi, key
+			mov		edi, OFFSET WORDS
+			mov		ecx, KEY_BYTES	
 			rep		movsb										; Copy input key matrix to key expansion matrix
 			
-			mov		esi, OFFSET KEY_EXPAN						; Initialize esi with first key
-			mov		edi, OFFSET KEY_EXPAN + KEY_BYTES			; Initialize esi with next key (redundant)
+			mov		esi, OFFSET WORDS							; Initialize it with first key
+			mov		edi, OFFSET WORDS + KEY_BYTES				; Initialize it with next key (redundant)
 
 			mov		ecx, 0
-
-Expansion:	INVOKE	Col1, esi, edi, ROUND_TABLE[ecx]			; Calculate `g` operation to get first column in the new key
+expand:		INVOKE	Col1, esi, edi, ROUND_TABLE[ecx]			; Calculate `g` operation to get first column in the new key
 			INVOKE	XORCols, esi, edi							; Claculate Columns XORing to get the rest of the new key
 			add		esi, KEY_BYTES
 			add		edi, KEY_BYTES
 			inc		ecx
-			cmp		ecx, 10										; 10 Rounds of expansion
-			jne		Expansion
+			cmp		ecx, ROUNDS
+			jb		expand
 
-			popad												; restore all registers
+			popad
 			ret
-ExpandKey ENDP
 
-;-----------------------------------------------------
-GetKey		PROC,
-			rnd		:DWORD,										; Round Number 0 - 10
-			key		:PTR BYTE									; Pointer to returned round Key [out]
-;
-; Given the number of round, it’ll fill the key matrix
-; with the current round key.
-; Returns: nothing
-;-----------------------------------------------------
-			pushad												; save all registers
-
-			mov		esi, OFFSET KEY_EXPAN
-			mov		cl, KEY_COLS
-			shl		rnd, cl
-			add		esi, rnd
-			mov		edi, key
-			cld
-			mov		ecx, KEY_BYTES
-			rep		movsb
-
-			popad												; restore all registers
-			ret
-GetKey ENDP
+ExpandKey	ENDP
 
 END
