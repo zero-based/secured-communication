@@ -4,32 +4,28 @@ INCLUDE AES.inc
 	
 ;-----------------------------------------------------
 SubBytes	PROC,
-			msg		:PTR BYTE,						; Offset of message
-			_Sbox	:PTR BYTE						; Offset of S_BOX matrix
+			msg		:PTR BYTE,							; Offset of message
+			box		:PTR BYTE							; Offset of (INV_S/S)_BOX
 ;
 ; Each byte in message matrix is replaced with another
 ; according to [S_BOX] lookup table.
 ; Returns: nothing
 ;-----------------------------------------------------
-			pushad									; save all registers
 
-			mov		ebx, 0							; indexing message matrix
-			mov		ecx, MSG_BYTES					; loop counter
-			mov		edx, msg
-Subst:		mov		esi, _Sbox
-			movzx	eax, BYTE PTR [edx]				; access message matrix
-			add		esi, eax
-			mov		al, [esi]						; access sbox matrix
-			mov		[edx], al						; substitute bytes
-			inc		edx
-			dec		ecx
-			cmp		ecx, 0
-			jz		EndLoop
-			jmp		Subst
-EndLoop:
+			pushad
 
-			popad									; restore all registers
+			mov		esi, box
+			mov		edi, msg
+
+			mov		ecx, MSG_BYTES
+next:		movzx	ebx, BYTE PTR [edi + ecx - 1]		; Offset = msg[i]
+			mov		al, [esi + ebx]
+			mov		[edi + ecx - 1], al					; msg[i] = box[Offset]
+			loop	next
+
+			popad
 			ret
+
 SubBytes	ENDP
 
 END

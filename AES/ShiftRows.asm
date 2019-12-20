@@ -1,42 +1,40 @@
 INCLUDE AES.inc
 
-.data
-rowIndex BYTE ?
-
 .code
 
 ;-----------------------------------------------------
 ShiftRows	PROC,
 			msg		:PTR BYTE,				; Offset of message
-			encrypt	:BYTE					; Encrypt/Decrypt Flag
+			mode	:BYTE					; ENC_MODE or DEC_MDOE
 ;
 ; It's a transposition step where the last three rows of 
 ; the state (matrix) are rotated left in encryption 
 ; according to their index.
 ; Returns: nothing
 ;----------------------------------------------------------
-			pushad							; save all registers
 
-			mov		rowIndex, 0
-			mov		ecx, MSG_ROWS 
+			pushad
+
 			mov		esi, msg
+			mov		ebx, 1											; RowIndex (Starting at 1, Row 0 is skipped)
 
-Shift:		mov		eax, [esi]
-			push	ecx
-			mov		cl, rowIndex
-			cmp		encrypt, 1				; if encryption flag == true
-			jnz		Decrypt
-			ror		eax, cl					; encrypt
-			jmp		Next
-Decrypt:	rol		eax, cl					; decrypt
-Next:		add		rowIndex, BITS_PER_BYTE
-			mov		[esi], eax
-			add		esi, MSG_ROWS
-			pop		ecx
-			loop	Shift
+rows:		mov		eax, BITS_PER_BYTE								; Initialize it with BITS_PER_BYTE
+			mul		ebx												; Multiply it by RowIndex
+			mov		ecx, eax										; RotateBits = RowIndex * BITS_PER_BYTE
 
-			popad							; restore all registers
+			cmp		mode, ENC_MODE
+			jne		decrypt
+			ror		DWORD PTR [esi + ebx * MSG_SIZE], cl			; Encrypt mode: rotate row #RowIndex right
+			jmp		cont
+decrypt:	rol		DWORD PTR [esi + ebx * MSG_SIZE], cl			; Decrypt mode: rotate row #RowIndex left
+
+cont:		inc		ebx
+			cmp		ebx, MSG_SIZE
+			jb		rows
+
+			popad
 			ret
+
 ShiftRows	ENDP
 
 END
