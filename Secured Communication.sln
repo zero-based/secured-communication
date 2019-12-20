@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_CONFIG", "_CONFIG\_CONFIG.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AES.Visualizer", "AES.Visualizer\AES.Visualizer.csproj", "{922441F9-F8A5-4599-A73E-37462F6CBF3A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AES.Test", "AES.Test\AES.Test.csproj", "{BF7C274D-8140-461E-9C73-18A4CB2D5B9F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,14 @@ Global
 		{922441F9-F8A5-4599-A73E-37462F6CBF3A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{922441F9-F8A5-4599-A73E-37462F6CBF3A}.Release|x86.ActiveCfg = Release|Any CPU
 		{922441F9-F8A5-4599-A73E-37462F6CBF3A}.Release|x86.Build.0 = Release|Any CPU
+		{BF7C274D-8140-461E-9C73-18A4CB2D5B9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF7C274D-8140-461E-9C73-18A4CB2D5B9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF7C274D-8140-461E-9C73-18A4CB2D5B9F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BF7C274D-8140-461E-9C73-18A4CB2D5B9F}.Debug|x86.Build.0 = Debug|Any CPU
+		{BF7C274D-8140-461E-9C73-18A4CB2D5B9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF7C274D-8140-461E-9C73-18A4CB2D5B9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF7C274D-8140-461E-9C73-18A4CB2D5B9F}.Release|x86.ActiveCfg = Release|Any CPU
+		{BF7C274D-8140-461E-9C73-18A4CB2D5B9F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
