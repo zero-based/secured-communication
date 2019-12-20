@@ -11,7 +11,6 @@ namespace ServerNS
         private static void Main(string[] args)
         {
             Console.Title = "Server";
-            Config.AssertLengths();
 
             // Start Socket
             var listener = new Socket(Config.IpAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -26,33 +25,27 @@ namespace ServerNS
             var clientSocket = listener.Accept();
             Logger.Log("New Client Connected.", ConsoleColor.Blue);
 
-            Logger.Separator();
+            while (true)
+            {
+                Logger.Separator();
 
-            // Receive Encrypted Message
-            var encryptedBytes = new byte[Config.BytesCount];
-            clientSocket.Receive(encryptedBytes);
-            var encryptedMsg = BitConverter.ToString(encryptedBytes);
-            Logger.Log("Received", encryptedMsg);
+                // Receive Key
+                var keyBytes = new byte[Config.BytesCount];
+                clientSocket.Receive(keyBytes);
+                Logger.Log("Key", BitConverter.ToString(keyBytes));
 
-            // Decrypt Message
-            var keyBytes = Encoding.ASCII.GetBytes(Config.Key);
-            Decrypt(encryptedBytes, keyBytes);
-            var decryptedBytes = encryptedBytes;
-            var decryptedMsg = Encoding.ASCII.GetString(decryptedBytes);
-            Logger.Log("Decrypted", decryptedMsg);
+                // Receive Encrypted Message
+                var msgBytes = new byte[Config.BytesCount];
+                clientSocket.Receive(msgBytes);
+                Logger.Log("Encrypted", BitConverter.ToString(msgBytes));
 
-            Logger.Separator();
+                // Decrypt Message
+                Decrypt(msgBytes, keyBytes);
+                Logger.Log("Decrypted", BitConverter.ToString(msgBytes));
+                Logger.Log("Message", Encoding.ASCII.GetString(msgBytes));
 
-            // Close Client Socket
-            clientSocket.Shutdown(SocketShutdown.Both);
-            clientSocket.Close();
-            Logger.Log("Client Session Terminated.", ConsoleColor.Red);
-
-            // Close Server Socket
-            listener.Close();
-            Logger.Log("Server Session Terminated.", ConsoleColor.Red);
-
-            Logger.Separator();
+                Logger.Log("Done", " ");
+            }
         }
 
         [DllImport(Config.AesDllPath)]

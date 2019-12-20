@@ -11,7 +11,6 @@ namespace ClientNS
         private static void Main(string[] args)
         {
             Console.Title = "Client";
-            Config.AssertLengths();
 
             // Start Socket
             var sender = new Socket(Config.IpAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -22,33 +21,48 @@ namespace ClientNS
             sender.Connect(Config.IpEndPoint);
             Logger.Log("Connected to Server.", ConsoleColor.Green);
 
-            Logger.Separator();
+            while (true)
+            {
+                Logger.Separator();
 
-            Logger.Log("Message", Config.Msg);
-            Logger.Log("Key", Config.Key);
+                // Key Prompt
+                var key = LimitedPrompt("Key", Config.BytesCount);
+                var keyBytes = Encoding.ASCII.GetBytes(key);
+                Logger.Log("Bytes", BitConverter.ToString(keyBytes));
 
-            // Encrypt Message
-            var msgBytes = Encoding.ASCII.GetBytes(Config.Msg);
-            var keyBytes = Encoding.ASCII.GetBytes(Config.Key);
-            Encrypt(msgBytes, keyBytes);
+                // Send Key
+                sender.Send(keyBytes);
+                Logger.Log("Sent Key", " ");
 
-            // Send Encrypted Message's Bytes
-            var encryptedBytes = msgBytes;
-            sender.Send(encryptedBytes);
-            var encryptedMsg = BitConverter.ToString(encryptedBytes);
-            Logger.Log("Sent", encryptedMsg);
+                // Message Prompt
+                var msg = LimitedPrompt("Message", Config.BytesCount);
+                var msgBytes = Encoding.ASCII.GetBytes(msg);
+                Logger.Log("Bytes", BitConverter.ToString(msgBytes));
 
-            Logger.Separator();
+                // Encrypt Message
+                Encrypt(msgBytes, keyBytes);
+                Logger.Log("Encrypted", BitConverter.ToString(msgBytes));
 
-            // Close Socket
-            sender.Shutdown(SocketShutdown.Both);
-            sender.Close();
-            Logger.Log("Session Terminated.", ConsoleColor.Red);
-
-            Logger.Separator();
+                // Send Message
+                sender.Send(msgBytes);
+                Logger.Log("Sent Message", " ");
+            }
         }
 
         [DllImport(Config.AesDllPath)]
         private static extern void Encrypt([In, Out]byte[] msg, [In, Out]byte[] key);
+
+        private static string LimitedPrompt(string key, int length)
+        {
+            string str;
+            do
+            {
+                Logger.Log(key);
+                str = Console.ReadLine();
+            } while (str.Length != length);
+
+            return str;
+        }
+
     }
 }
