@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AES.Visualizer", "AES.Visua
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AES.Test", "AES.Test\AES.Test.csproj", "{BF7C274D-8140-461E-9C73-18A4CB2D5B9F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Stego", "Stego\Stego.vcxproj", "{305FE392-79D0-4C15-BF69-84B7E61384A4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +81,12 @@ Global
 		{BF7C274D-8140-461E-9C73-18A4CB2D5B9F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BF7C274D-8140-461E-9C73-18A4CB2D5B9F}.Release|x86.ActiveCfg = Release|Any CPU
 		{BF7C274D-8140-461E-9C73-18A4CB2D5B9F}.Release|x86.Build.0 = Release|Any CPU
+		{305FE392-79D0-4C15-BF69-84B7E61384A4}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{305FE392-79D0-4C15-BF69-84B7E61384A4}.Debug|x86.ActiveCfg = Debug|Win32
+		{305FE392-79D0-4C15-BF69-84B7E61384A4}.Debug|x86.Build.0 = Debug|Win32
+		{305FE392-79D0-4C15-BF69-84B7E61384A4}.Release|Any CPU.ActiveCfg = Release|Win32
+		{305FE392-79D0-4C15-BF69-84B7E61384A4}.Release|x86.ActiveCfg = Release|Win32
+		{305FE392-79D0-4C15-BF69-84B7E61384A4}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
