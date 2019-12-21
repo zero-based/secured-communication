@@ -14,7 +14,7 @@
     <MASM Include="main.asm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{4164AA65-1EF9-4E69-899B-D1BED776070B}</ProjectGuid>
+    <ProjectGuid>{305FE392-79D0-4C15-BF69-84B7E61384A4}</ProjectGuid>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
     <ProjectName>Stego</ProjectName>
   </PropertyGroup>

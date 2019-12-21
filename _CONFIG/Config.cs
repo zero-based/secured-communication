@@ -5,6 +5,9 @@ namespace _CONFIG
 {
     public static class Config
     {
+        // Stego DLL
+        public const string StegoDllPath = @"..\..\..\Stego\Debug\Stego.dll";
+
         // AES DLL
         public const string AesDllPath = @"..\..\..\AES\Debug\AES.dll";
         private const int BitsCount = 128;
