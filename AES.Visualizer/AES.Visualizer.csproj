@@ -41,11 +41,5 @@
     <Compile Include="Program.cs" />
     <Compile Include="Visualizer.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\_CONFIG\_CONFIG.csproj">
-      <Project>{800ba467-9154-4abe-9327-94363b82772c}</Project>
-      <Name>_CONFIG</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

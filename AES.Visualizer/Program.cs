@@ -1,12 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using _CONFIG;
 
 namespace AES.Visualizer
 {
     internal static class Program
     {
+        private const string Msg = "__Hello_World!__";
+        private const string Key = "___SECURE_KEY___";
+        private static readonly byte[] EncryptedMsgBytes =
+        {
+            0x53, 0xC8, 0x59, 0x6E,
+            0xCF, 0x28, 0x67, 0xFB,
+            0x2D, 0xEA, 0x06, 0xC3,
+            0x56, 0x4A, 0xE2, 0xB0
+        };
+
         private enum Mode
         {
             Encrypt,
@@ -33,14 +41,14 @@ namespace AES.Visualizer
 
             Visualizer.WriteH1(mode == Mode.Encrypt ? "Encryption Mode" : "Decryption Mode");
 
-            var key = Encoding.ASCII.GetBytes(Config.Key);
+            var key = Encoding.ASCII.GetBytes(Key);
             Visualizer.WriteH1("Key");
             Visualizer.WriteH2(Encoding.ASCII.GetString(key));
             Visualizer.WriteBytes(key);
 
             var input = mode == Mode.Encrypt
-                ? Encoding.ASCII.GetBytes(Config.Msg)
-                : Config.EncryptedMsgBytes;
+                ? Encoding.ASCII.GetBytes(Msg)
+                : EncryptedMsgBytes;
 
             Visualizer.WriteH1("Input");
             Visualizer.WriteH2(Encoding.ASCII.GetString(input));
