@@ -9,10 +9,9 @@ namespace Stego.Test
     [TestClass]
     public class StegoTests
     {
-        private const string BitmapsDir  = @"Bitmaps\";
-        private const string StegoSuffix = "-stego";
-        private const string BitmapExt = ".bmp";
-
+        public const string BitmapsDir  = @"Bitmaps\";
+        public const string StegoSuffix = "-stego";
+        public const string BitmapExt = ".bmp";
 
         private static IEnumerable<string[]> GetData()
         {
