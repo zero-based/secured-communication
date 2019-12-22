@@ -40,6 +40,7 @@ Prepend the following tags to your commit messages depending on the project you 
 | **`[VIS]`** | AES.Visualizer |
 | **`[C/S]`** | Client/Server  |
 | **`[STG]`** | Stego          |
+| **`[CMP]`** | Stego.Comparer |
 | **`[TST]`** | \*.Test        |
 
 ---
