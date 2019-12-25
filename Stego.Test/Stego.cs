@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace Stego
+namespace Stego.Test
 {
     internal static class Stego
     {

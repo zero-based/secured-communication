@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
-using _CONFIG;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Stego.Test
@@ -9,6 +8,8 @@ namespace Stego.Test
     [TestClass]
     public class StegoTests
     {
+        private const string StegoDllPath = @"..\..\..\Stego\Debug\Stego.dll";
+
         public const string BitmapsDir  = @"Bitmaps\";
         public const string StegoSuffix = "-stego";
         public const string BitmapExt = ".bmp";
@@ -51,10 +52,10 @@ namespace Stego.Test
             CollectionAssert.AreEqual(expectedMsgBytes, actualMsgBytes);
         }
 
-        [DllImport(Config.StegoDllPath)]
+        [DllImport(StegoDllPath)]
         private static extern void Embed([In, Out] byte[] pixels, [In, Out] byte[] msg, int length);
 
-        [DllImport(Config.StegoDllPath)]
+        [DllImport(StegoDllPath)]
         private static extern void Extract([In, Out] byte[] pixels, [In, Out] byte[] msg, int length);
     }
 }
